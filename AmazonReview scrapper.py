@@ -30,19 +30,19 @@ def ParseReviews(asin):
         cleaned_response = response.text.replace('\x00', '')
         
         parser = html.fromstring(cleaned_response)
-        XPATH_AGGREGATE = '//span[@id="acrCustomerReviewText"]'
+        #XPATH_AGGREGATE = '//span[@id="acrCustomerReviewText"]'
         XPATH_REVIEW_SECTION_1 = '//div[contains(@id,"reviews-summary")]'
         XPATH_REVIEW_SECTION_2 = '//div[@data-hook="review"]'
-        XPATH_AGGREGATE_RATING = '//table[@id="histogramTable"]//tr'
+        #XPATH_AGGREGATE_RATING = '//table[@id="histogramTable"]//tr'
         XPATH_PRODUCT_NAME = '//h1//span[@id="productTitle"]//text()'
-        XPATH_PRODUCT_PRICE = '//span[@id="priceblock_ourprice"]/text()'
+        #XPATH_PRODUCT_PRICE = '//span[@id="priceblock_ourprice"]/text()'
 
-        raw_product_price = parser.xpath(XPATH_PRODUCT_PRICE)
+        #raw_product_price = parser.xpath(XPATH_PRODUCT_PRICE)
         raw_product_name = parser.xpath(XPATH_PRODUCT_NAME)
-        total_ratings  = parser.xpath(XPATH_AGGREGATE_RATING)
+        #total_ratings  = parser.xpath(XPATH_AGGREGATE_RATING)
         reviews = parser.xpath(XPATH_REVIEW_SECTION_1)
 
-        product_price = ''.join(raw_product_price).replace(',', '')
+        #product_price = ''.join(raw_product_price).replace(',', '')
         product_name = ''.join(raw_product_name).strip()
 
         if not reviews:
@@ -51,15 +51,16 @@ def ParseReviews(asin):
         reviews_list = []
 
         # Grabing the rating  section in product page
-        for ratings in total_ratings:
-            extracted_rating = ratings.xpath('./td//a//text()')
-            if extracted_rating:
-                rating_key = extracted_rating[0] 
-                raw_raing_value = extracted_rating[1]
-                rating_value = raw_raing_value
-                if rating_key:
-                    ratings_dict.update({rating_key: rating_value})
-        
+        ###
+        #for ratings in total_ratings:
+         #   extracted_rating = ratings.xpath('./td//a//text()')
+          #  if extracted_rating:
+           #     rating_key = extracted_rating[0] 
+            #    raw_raing_value = extracted_rating[1]
+             #   rating_value = raw_raing_value
+              #  if rating_key:
+               #     ratings_dict.update({rating_key: rating_value})
+        ###
         # Parsing individual reviews
         for review in reviews:
             XPATH_RATING  = './/i[@data-hook="review-star-rating"]//text()'
@@ -96,7 +97,7 @@ def ParseReviews(asin):
             if raw_review_text2:
                 json_loaded_review_data = loads(raw_review_text2[0])
                 json_loaded_review_data_text = json_loaded_review_data['rest']
-                cleaned_json_loaded_review_data_text = re.sub('<.*?>', '', json_loaded_review_data_text)
+                cleaned_json_loaded_review_data_text = sub('<.*?>', '', json_loaded_review_data_text)
                 full_review_text = review_text+cleaned_json_loaded_review_data_text
             else:
                 full_review_text = review_text
@@ -122,18 +123,22 @@ def ParseReviews(asin):
                     'ratings': ratings_dict,
                     'reviews': reviews_list,
                     'url': amazon_url,
-                    'name': product_name,
-                    'price': product_price
+                    'name': product_name
+                    #'price': product_price
                 
                 }
         return data
 
     return {"error": "failed to process the page", "url": amazon_url}
-            
+ 
+
+def ParseUser(asin):
+    pass
+   # amazon_user_url_profil  = 'http://www.amazon.com/dp/'+asin          
 
 def ReadAsin():
     # Add your own ASINs here
-    AsinList = ['B01ETPUQ6E', 'B017HW9DEW', 'B00U8KSIOM']
+    AsinList = ['B01ETPUQ6E']#, 'B017HW9DEW', 'B00U8KSIOM']
     extracted_data = []
     
     for asin in AsinList:
